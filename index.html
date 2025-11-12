@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente de Objeciones - Call Center</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Asistente de Objeciones</h1>
+            <p>Sugerencias inteligentes en tiempo real para tu equipo de ventas</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <textarea 
+                    id="objeccionInput" 
+                    placeholder="Escribe la objección del cliente ej: 'Es muy caro', 'Lo pensaré', 'Ya tengo proveedor'..."
+                    rows="4"
+                ></textarea>
+                <button id="buscarBtn" class="primary-btn">
+                    🚀 Buscar Respuestas
+                </button>
+            </div>
+
+            <div id="loading" class="hidden">
+                <div class="spinner"></div>
+                <p>Buscando las mejores respuestas...</p>
+            </div>
+
+            <div id="resultados" class="hidden">
+                <h3>💡 Respuestas Sugeridas</h3>
+                <div id="respuestasLista"></div>
+            </div>
+
+            <div id="error" class="hidden error-message">
+                <p>❌ Error al conectar con el asistente. Intenta nuevamente.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Powered by IA • Para uso interno del equipo de ventas</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
