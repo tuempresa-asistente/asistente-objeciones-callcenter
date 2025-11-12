@@ -2,7 +2,7 @@ javascript
 // CONFIGURACIÓN - WEB APP DEL ASISTENTE DE OBJECIONES
 class AsistenteObjeciones {
     constructor() {
-        this.scriptUrl = 'https://script.google.com/macros/s/AKfycbzd2KHcWuwNI-5XrZDUtos2CvivRTmZH9s-6q3YoWdWxlPnLKxdpGzom03skDDzrdHkzw/exec';
+        this.scriptUrl = 'https://script.google.com/macros/s/AKfycbxxb8YVZCgzJ7_6BCAMnqdQ6B9tbchhMPOamd-90UQYO7-Wcql-FQaJC2-Z5flLy0Op/exec';
         this.init();
     }
 
@@ -210,5 +210,6 @@ class AsistenteObjeciones {
 document.addEventListener('DOMContentLoaded', () => {
     new AsistenteObjeciones();
 });
+
 
 
