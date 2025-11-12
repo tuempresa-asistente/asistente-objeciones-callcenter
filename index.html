@@ -1,211 +1,51 @@
-// CONFIGURACIÓN - WEB APP DEL ASISTENTE DE OBJECIONES
-class AsistenteObjeciones {
-    constructor() {
-        this.scriptUrl = 'https://script.google.com/macros/s/AKfycbxxb8YVZCgzJ7_6BCAMnqdQ6B9tbchhMPOamd-90UQYO7-Wcql-FQaJC2-Z5flLy0Op/exec';
-        this.init();
-    }
+html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente de Objeciones - Call Center</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Asistente de Objeciones</h1>
+            <p>Sugerencias inteligentes en tiempo real para tu equipo de ventas</p>
+        </header>
 
-    init() {
-        this.buscarBtn = document.getElementById('buscarBtn');
-        this.objeccionInput = document.getElementById('objeccionInput');
-        this.loading = document.getElementById('loading');
-        this.resultados = document.getElementById('resultados');
-        this.error = document.getElementById('error');
-        this.respuestasLista = document.getElementById('respuestasLista');
-
-        this.buscarBtn.addEventListener('click', () => this.buscarRespuestas());
-        
-        // Buscar al presionar Ctrl+Enter
-        this.objeccionInput.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') {
-                e.preventDefault();
-                this.buscarRespuestas();
-            }
-        });
-
-        // Cargar ejemplos automáticamente
-        this.mostrarEjemplos();
-    }
-
-    async buscarRespuestas() {
-        const texto = this.objeccionInput.value.trim();
-        
-        if (!texto) {
-            this.mostrarNotificacion('Por favor escribe una objección', 'warning');
-            return;
-        }
-
-        this.mostrarLoading();
-        this.ocultarResultados();
-
-        try {
-            // USAR BACKEND REAL
-            const respuestas = await this.obtenerRespuestasReales(texto);
-            
-            this.mostrarRespuestas(respuestas);
-        } catch (error) {
-            console.error('Error:', error);
-            this.mostrarError();
-        } finally {
-            this.ocultarLoading();
-        }
-    }
-
-    // FUNCIÓN REAL - CONECTAR CON GOOGLE APPS SCRIPT
-    async obtenerRespuestasReales(objeccion) {
-        const response = await fetch(this.scriptUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ objeccion: objeccion })
-        });
-
-        if (!response.ok) throw new Error('Error en la respuesta del servidor');
-        
-        const data = await response.json();
-        
-        // Verificar la estructura de la respuesta
-        if (data.status === 'success') {
-            return data.data;
-        } else {
-            throw new Error(data.message || 'Error en el servidor');
-        }
-    }
-
-    mostrarLoading() {
-        this.loading.classList.remove('hidden');
-        this.buscarBtn.disabled = true;
-        this.buscarBtn.textContent = 'Buscando...';
-    }
-
-    ocultarLoading() {
-        this.loading.classList.add('hidden');
-        this.buscarBtn.disabled = false;
-        this.buscarBtn.textContent = '🚀 Buscar Respuestas';
-    }
-
-    mostrarResultados() {
-        this.resultados.classList.remove('hidden');
-    }
-
-    ocultarResultados() {
-        this.resultados.classList.add('hidden');
-        this.error.classList.add('hidden');
-    }
-
-    mostrarError() {
-        this.error.classList.remove('hidden');
-    }
-
-    mostrarRespuestas(respuestas) {
-        this.respuestasLista.innerHTML = '';
-        
-        if (!respuestas || respuestas.length === 0) {
-            this.respuestasLista.innerHTML = `
-                <div class="respuesta-item">
-                    <p>No se encontraron respuestas específicas para esta objección.</p>
-                    <p><strong>Sugerencia:</strong> Intenta con objeciones más comunes como "Es muy caro", "Lo pensaré", etc.</p>
-                </div>
-            `;
-        } else {
-            respuestas.forEach((resp, index) => {
-                const respElement = document.createElement('div');
-                respElement.className = 'respuesta-item';
-                respElement.innerHTML = this.generarHTMLRespuesta(resp);
-                this.respuestasLista.appendChild(respElement);
-            });
-
-            this.configurarBotonesCopiar();
-        }
-        
-        this.mostrarResultados();
-    }
-
-    generarHTMLRespuesta(resp) {
-        return `
-            <div class="respuesta-texto">${resp.respuestas[0]}</div>
-            <div class="respuesta-meta">
-                <span class="categoria">${resp.categoria}</span>
-                <span class="efectividad">Efectividad: ${resp.efectividad}</span>
-            </div>
-            <div class="botones-respuesta">
-                <button class="copiar-btn" data-texto="${resp.respuestas[0]}">
-                    📋 Copiar Respuesta
+        <div class="main-content">
+            <div class="input-section">
+                <textarea 
+                    id="objeccionInput" 
+                    placeholder="Escribe la objección del cliente ej: 'Es muy caro', 'Lo pensaré', 'Ya tengo proveedor'..."
+                    rows="4"
+                ></textarea>
+                <button id="buscarBtn" class="primary-btn">
+                    🚀 Buscar Respuestas
                 </button>
-                ${resp.respuestas[1] ? `
-                    <button class="copiar-btn" data-texto="${resp.respuestas[1]}" style="background: #e67e22;">
-                        🔄 Alternativa 2
-                    </button>
-                ` : ''}
-                ${resp.respuestas[2] ? `
-                    <button class="copiar-btn" data-texto="${resp.respuestas[2]}" style="background: #9b59b6;">
-                        💎 Alternativa 3
-                    </button>
-                ` : ''}
             </div>
-        `;
-    }
 
-    configurarBotonesCopiar() {
-        document.querySelectorAll('.copiar-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.copiarTexto(e.target.getAttribute('data-texto'), e.target);
-            });
-        });
-    }
+            <div id="loading" class="hidden">
+                <div class="spinner"></div>
+                <p>Buscando las mejores respuestas...</p>
+            </div>
 
-    async copiarTexto(texto, boton) {
-        try {
-            await navigator.clipboard.writeText(texto);
-            this.mostrarFeedbackCopiado(boton);
-        } catch (err) {
-            // Fallback para navegadores antiguos
-            const textArea = document.createElement('textarea');
-            textArea.value = texto;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            this.mostrarFeedbackCopiado(boton);
-        }
-    }
+            <div id="resultados" class="hidden">
+                <h3>💡 Respuestas Sugeridas</h3>
+                <div id="respuestasLista"></div>
+            </div>
 
-    mostrarFeedbackCopiado(boton) {
-        const textoOriginal = boton.textContent;
-        boton.textContent = '✓ Copiado!';
-        boton.classList.add('copiado');
-        
-        setTimeout(() => {
-            boton.textContent = textoOriginal;
-            boton.classList.remove('copiado');
-        }, 2000);
-    }
+            <div id="error" class="hidden error-message">
+                <p>❌ Error al conectar con el asistente. Intenta nuevamente.</p>
+            </div>
+        </div>
 
-    mostrarNotificacion(mensaje, tipo = 'info') {
-        // Implementación simple de notificación
-        alert(mensaje);
-    }
+        <footer>
+            <p>Powered by IA • Para uso interno del equipo de ventas</p>
+        </footer>
+    </div>
 
-    mostrarEjemplos() {
-        const ejemplos = [
-            "Es muy caro",
-            "Lo pensaré", 
-            "Ya tengo proveedor",
-            "No es prioridad",
-            "No estoy convencido"
-        ];
-
-        // Rotar ejemplos en el placeholder
-        let index = 0;
-        setInterval(() => {
-            this.objeccionInput.placeholder = `Escribe la objección del cliente ej: '${ejemplos[index]}'...`;
-            index = (index + 1) % ejemplos.length;
-        }, 3000);
-    }
-}
-
-// Inicializar la aplicación cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    new AsistenteObjeciones();
-});
+    <script src="script.js"></script>
+</body>
+</html>
